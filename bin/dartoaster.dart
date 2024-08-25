@@ -17,6 +17,15 @@ int main() {
     return -1;
   }
 
+  var imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+
+  if(imgInit(imgFlags) != imgFlags) {
+    print(sdlGetError());
+    sdlQuit();
+
+    return -1;
+  }
+
   ttfInit();
 
   Renderer engineRenderer = Renderer(600, 800);
@@ -40,6 +49,17 @@ int main() {
   var time = sdlGetTicks();
   var frameRate = 0;
   var frameCount = 0;
+
+  Pointer<SdlTexture> texture = nullptr;
+
+  var loadTexture = engineRenderer.getRenderer().loadTexture("assets/player.png");
+
+  if(loadTexture == nullptr) {
+    print("Cannot load texture");
+    return 1;
+  }
+
+  texture = loadTexture;
 
   var running = true;
   while (running) {
@@ -66,6 +86,10 @@ int main() {
 
     engineRenderer.clear();
 
+    if(texture != nullptr) {
+      engineRenderer.getRenderer().copy(texture);
+    }
+
     debugText.render(
         engineRenderer.getRenderer(), "Toaster is toasting", 10.0, 10.0);
     debugText.render(engineRenderer.getRenderer(),
@@ -78,6 +102,7 @@ int main() {
 
     engineRenderer.present();
   }
+  
   gfx.gfxFree();
   event.callocFree();
   debugText.destroy();
